@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TerraTrace – Precision Data for Net Zero Operations</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js">
+document.addEventListener('click', function(e){
+  const btn = e.target.closest('.acct-btn');
+  if(btn){
+    const wrap = btn.parentElement;
+    if(wrap){
+      wrap.querySelectorAll('.acct-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+  }
+});
+
+</script>
+<style>
+:root {
+  --brand: #5B5BD6;
+  --brand-dark: #4747C2;
+  --brand-light: #E8E8FF;
+  --accent: #10B981;
+  --accent2: #F59E0B;
+  --danger: #EF4444;
+  --text: #0F0F23;
+  --text-2: #6B7280;
+  --text-3: #9CA3AF;
+  --bg: #F8F8FC;
+  --surface: #FFFFFF;
+  --border: #E5E7EB;
+  --sidebar-w: 190px;
+  --header-h: 60px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+/* ──── UTILITY ──── */
+.hidden{display:none!important}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;font-family:'DM Mono',monospace}
+.badge-green{background:#D1FAE5;color:#065F46}
+.badge-red{background:#FEE2E2;color:#991B1B}
+.badge-orange{background:#FEF3C7;color:#92400E}
+.badge-blue{background:#DBEAFE;color:#1E40AF}
+.badge-purple{background:var(--brand-light);color:var(--brand-dark)}
+.badge-gray{background:#F3F4F6;color:#374151}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:500}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s;font-family:'DM Sans',sans-serif}
+.btn-primary{background:var(--brand);color:#fff}
+.btn-primary:hover{background:var(--brand-dark)}
+.btn-outline{background:#fff;color:var(--text);border:1.5px solid var(--border)}
+.btn-outline:hover{border-color:var(--brand);color:var(--brand)}
+.btn-sm{padding:6px 12px;font-size:12px;border-radius:6px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+input,select,textarea{font-family:'DM Sans',sans-serif;font-size:13px}
+
+/* ──── SCREENS ──── */
+.screen{display:none;min-height:100vh}
+.screen.active{display:block}
+
+/* ════════════════════════════════
+   LANDING
+════════════════════════════════ */
+#screen-landing{background:#fff}
+/* Nav */
+.land-nav{display:flex;align-items:center;justify-content:space-between;padding:16px 48px;border-bottom:1px solid var(--border);position:sticky;top:0;background:#fff;z-index:100}
+.land-logo{display:flex;align-items:center;gap:8px;font-family:'Sora',sans-serif;font-weight:700;font-size:16px;color:var(--text)}
+.land-logo-icon{width:26px;height:26px;background:var(--brand);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.land-logo-icon svg{width:14px;height:14px;fill:#fff}
+.land-nav-links{display:flex;align-items:center;gap:28px}
+.land-nav-links a{font-size:13px;color:var(--text-2);text-decoration:none;cursor:pointer}
+.land-nav-links a:hover{color:var(--text)}
+.land-nav-actions{display:flex;align-items:center;gap:10px}
+/* Hero */
+.land-hero{display:grid;grid-template-columns:1fr 420px;gap:60px;align-items:center;padding:72px 48px;max-width:1100px;margin:0 auto}
+.land-pill{display:inline-flex;align-items:center;gap:6px;background:var(--brand-light);color:var(--brand);padding:4px 12px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.05em;margin-bottom:20px}
+.land-h1{font-family:'Sora',sans-serif;font-size:52px;font-weight:800;line-height:1.1;margin-bottom:20px}
+.land-h1 span{color:var(--brand)}
+.land-sub{font-size:15px;color:var(--text-2);line-height:1.7;max-width:420px;margin-bottom:32px}
+.land-ctas{display:flex;gap:12px;align-items:center;margin-bottom:28px}
+.land-trust{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-3)}
+.land-avatars{display:flex}
+.land-avatars span{width:26px;height:26px;border-radius:50%;border:2px solid #fff;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:700;margin-left:-6px}
+.land-avatars span:first-child{margin-left:0}
+/* Dashboard preview card */
+.land-dash-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.08)}
+.land-dash-header{font-size:9px;font-weight:700;letter-spacing:.08em;color:var(--text-3);text-transform:uppercase;margin-bottom:12px}
+.land-dash-metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.land-dash-metric label{font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--text-3);text-transform:uppercase}
+.land-dash-metric .val{font-family:'Sora',sans-serif;font-size:24px;font-weight:700;margin-top:2px}
+.land-dash-metric .val.red{color:var(--danger)}
+.land-dash-ai{background:var(--brand-light);border-radius:10px;padding:12px;font-size:11px;color:var(--brand-dark)}
+.land-dash-ai strong{display:block;margin-bottom:3px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--brand)}
+/* Partners */
+.land-partners{border-top:1px solid var(--border);padding:28px 48px;text-align:center}
+.land-partners p{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--text-3);text-transform:uppercase;margin-bottom:20px}
+.land-partner-logos{display:flex;justify-content:center;gap:40px;flex-wrap:wrap}
+.land-partner-logos span{font-size:13px;font-weight:600;color:var(--text-3);display:flex;align-items:center;gap:6px}
+/* Features */
+.land-features{padding:80px 48px;max-width:1100px;margin:0 auto;text-align:center}
+.land-section-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);margin-bottom:12px}
+.land-h2{font-family:'Sora',sans-serif;font-size:36px;font-weight:800;margin-bottom:12px}
+.land-h2-sub{font-size:15px;color:var(--text-2);max-width:480px;margin:0 auto 48px}
+.land-features-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;text-align:left}
+.land-feat-card{padding:24px}
+.land-feat-icon{width:36px;height:36px;background:var(--brand-light);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;font-size:16px}
+.land-feat-card h4{font-family:'Sora',sans-serif;font-size:15px;font-weight:700;margin-bottom:8px}
+.land-feat-card p{font-size:12px;color:var(--text-2);line-height:1.6;margin-bottom:10px}
+.land-feat-card a{font-size:11px;font-weight:600;color:var(--brand);cursor:pointer;text-decoration:none}
+/* Steps */
+.land-steps{background:var(--bg);padding:80px 48px}
+.land-steps-inner{max-width:1100px;margin:0 auto}
+.land-steps-header{margin-bottom:48px}
+.land-steps-header .learn-more{font-size:12px;color:var(--brand);font-weight:600;cursor:pointer}
+.land-steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px}
+.land-step-num{width:32px;height:32px;background:var(--brand);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;margin-bottom:14px}
+.land-step h4{font-family:'Sora',sans-serif;font-size:15px;font-weight:700;margin-bottom:8px}
+.land-step p{font-size:12px;color:var(--text-2);line-height:1.6}
+/* AI Section */
+.land-ai{margin:80px 48px;max-width:1100px;margin-left:auto;margin-right:auto;background:linear-gradient(135deg,var(--brand) 0%,#4747C2 100%);border-radius:20px;padding:48px;display:grid;grid-template-columns:1fr 340px;gap:40px;align-items:center;color:#fff}
+.land-ai-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:12px}
+.land-ai h2{font-family:'Sora',sans-serif;font-size:40px;font-weight:800;line-height:1.15;margin-bottom:16px}
+.land-ai-bullets{list-style:none;margin-bottom:28px}
+.land-ai-bullets li{font-size:13px;color:rgba(255,255,255,.85);padding:6px 0;display:flex;align-items:center;gap:8px}
+.land-ai-bullets li::before{content:'✓';background:rgba(255,255,255,.2);width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.land-ai-cards{display:flex;flex-direction:column;gap:10px}
+.land-ai-card{background:rgba(255,255,255,.12);border-radius:10px;padding:14px;backdrop-filter:blur(8px)}
+.land-ai-card-label{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:4px}
+.land-ai-card h5{font-size:13px;font-weight:700;margin-bottom:2px}
+.land-ai-card p{font-size:11px;color:rgba(255,255,255,.7)}
+.land-ai-card .ai-tag{display:inline-block;background:rgba(255,255,255,.2);border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;margin-top:6px;margin-right:4px}
+/* CTA */
+.land-cta-section{padding:80px 48px;text-align:center}
+.land-cta-section h2{font-family:'Sora',sans-serif;font-size:40px;font-weight:800;margin-bottom:12px}
+.land-cta-section p{font-size:14px;color:var(--text-2);margin-bottom:28px}
+.land-cta-section .cta-btns{display:flex;justify-content:center;gap:12px;margin-bottom:12px}
+.land-cta-section .fine-print{font-size:11px;color:var(--text-3)}
+/* Footer */
+.land-footer{border-top:1px solid var(--border);padding:40px 48px;display:grid;grid-template-columns:220px repeat(4,1fr);gap:32px}
+.land-footer-brand p{font-size:12px;color:var(--text-2);margin-top:8px;line-height:1.6}
+.land-footer-col h5{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);margin-bottom:12px}
+.land-footer-col a{display:block;font-size:13px;color:var(--text-2);margin-bottom:8px;cursor:pointer;text-decoration:none}
+.land-footer-col a:hover{color:var(--brand)}
+.land-footer-bottom{border-top:1px solid var(--border);padding:16px 48px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text-3)}
+.land-footer-social{display:flex;gap:12px}
+.land-footer-social a{color:var(--text-3);text-decoration:none;cursor:pointer}
+
+/* ════════════════════════════════
+   SIGN IN
+════════════════════════════════ */
+#screen-signin{display:none;min-height:100vh;grid-template-columns:480px 1fr}
+#screen-signin.active{display:grid}
+.signin-left{background:linear-gradient(160deg,var(--brand) 0%,#3B3B9A 100%);padding:48px;display:flex;flex-direction:column;justify-content:space-between;color:#fff}
+.signin-left-logo{display:flex;align-items:center;gap:10px;font-family:'Sora',sans-serif;font-weight:700;font-size:18px}
+.signin-left-logo-icon{width:32px;height:32px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.signin-left h2{font-family:'Sora',sans-serif;font-size:42px;font-weight:800;line-height:1.15;margin:48px 0 36px}
+.signin-left h2 span{color:rgba(255,255,255,.55)}
+.signin-feat{display:flex;gap:14px;margin-bottom:20px;align-items:flex-start}
+.signin-feat-icon{width:36px;height:36px;background:rgba(255,255,255,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px}
+.signin-feat h5{font-size:14px;font-weight:700;margin-bottom:3px}
+.signin-feat p{font-size:12px;color:rgba(255,255,255,.7);line-height:1.5}
+.signin-left-footer{border-top:1px solid rgba(255,255,255,.15);padding-top:20px;display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,.5)}
+.signin-right{padding:48px;display:flex;align-items:center;justify-content:center;background:#fff}
+.signin-form{width:100%;max-width:360px}
+.signin-form h2{font-family:'Sora',sans-serif;font-size:28px;font-weight:800;margin-bottom:6px}
+.signin-form p{font-size:13px;color:var(--text-2);margin-bottom:28px}
+.signin-social-btn{width:100%;padding:11px;border:1.5px solid var(--border);border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;gap:10px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:10px;font-family:'DM Sans',sans-serif;transition:border-color .15s}
+.signin-social-btn:hover{border-color:var(--brand)}
+.signin-divider{text-align:center;position:relative;margin:20px 0}
+.signin-divider::before{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:var(--border)}
+.signin-divider span{position:relative;background:#fff;padding:0 12px;font-size:11px;color:var(--text-3);font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.form-group{margin-bottom:16px}
+.form-group label{display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:6px}
+.form-group label a{color:var(--brand);cursor:pointer;font-weight:500}
+.form-group input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none;transition:border-color .15s}
+.form-group input:focus{border-color:var(--brand)}
+.signin-submit{width:100%;padding:12px;background:var(--brand);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;font-family:'Sora',sans-serif;transition:background .15s}
+.signin-submit:hover{background:var(--brand-dark)}
+.signin-footer-note{text-align:center;font-size:12px;color:var(--text-2);margin-top:20px}
+.signin-footer-note a{color:var(--brand);font-weight:600;cursor:pointer}
+
+/* ════════════════════════════════
+   APP SHELL
+════════════════════════════════ */
+#screen-app{display:none;min-height:100vh;flex-direction:column}
+#screen-app.active{display:flex}
+.app-header{height:var(--header-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:16px;position:sticky;top:0;z-index:100}
+.app-logo{display:flex;align-items:center;gap:8px;font-family:'Sora',sans-serif;font-weight:700;font-size:15px;width:var(--sidebar-w);flex-shrink:0;cursor:pointer}
+.app-logo-icon{width:26px;height:26px;background:var(--brand);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.app-search{flex:1;max-width:400px;position:relative}
+.app-search input{width:100%;padding:8px 12px 8px 36px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg);outline:none}
+.app-search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--text-3)}
+.app-header-right{margin-left:auto;display:flex;align-items:center;gap:14px}
+.app-notif{position:relative;width:34px;height:34px;border-radius:8px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px}
+.app-notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--danger);border-radius:50%;border:1.5px solid #fff}
+.app-user{display:flex;align-items:center;gap:8px;cursor:pointer}
+.app-user-avatar{width:32px;height:32px;border-radius:50%;background:var(--brand);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700}
+.app-user-info{line-height:1.3}
+.app-user-name{font-size:13px;font-weight:600}
+.app-user-role{font-size:10px;color:var(--text-3)}
+.app-body{display:flex;flex:1;overflow:hidden}
+/* Sidebar */
+.sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:16px 0;flex-shrink:0;overflow-y:auto}
+.sidebar-nav{flex:1}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 16px;font-size:13px;font-weight:500;color:var(--text-2);cursor:pointer;border-radius:0;transition:all .15s;border-left:3px solid transparent}
+.sidebar-item:hover{background:var(--bg);color:var(--text)}
+.sidebar-item.active{background:var(--brand-light);color:var(--brand);border-left-color:var(--brand);font-weight:600}
+.sidebar-item svg,.sidebar-item .icon{font-size:15px;opacity:.7;flex-shrink:0}
+.sidebar-item.active .icon{opacity:1}
+.sidebar-bottom{border-top:1px solid var(--border);padding:12px 16px}
+.sidebar-ai-insight{background:var(--brand-light);border-radius:8px;padding:10px 12px;margin-bottom:12px}
+.sidebar-ai-insight .ai-label{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--brand);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.sidebar-ai-insight p{font-size:11px;color:var(--brand-dark);line-height:1.5}
+.sidebar-settings,.sidebar-logout{display:flex;align-items:center;gap:8px;padding:8px 4px;font-size:12px;color:var(--text-2);cursor:pointer}
+.sidebar-logout{color:var(--danger)}
+.sidebar-collapse{display:flex;align-items:center;justify-content:flex-end;padding:8px 12px;cursor:pointer;color:var(--text-3);font-size:12px;border-top:1px solid var(--border);margin-top:4px}
+/* Main content */
+.main-content{flex:1;overflow-y:auto;padding:28px 32px}
+.page{display:none}
+.page.active{display:block}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px}
+.page-title h1{font-family:'Sora',sans-serif;font-size:24px;font-weight:800}
+.page-title p{font-size:13px;color:var(--text-2);margin-top:4px}
+.page-actions{display:flex;gap:8px;flex-shrink:0}
+/* Stat cards row */
+.stat-row{display:grid;gap:16px;margin-bottom:24px}
+.stat-row-4{grid-template-columns:repeat(4,1fr)}
+.stat-row-3{grid-template-columns:repeat(3,1fr)}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+.stat-card-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.stat-card-value{font-family:'Sora',sans-serif;font-size:28px;font-weight:800;margin-bottom:4px}
+.stat-card-sub{font-size:11px;color:var(--text-2)}
+.stat-trend{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px;margin-bottom:4px}
+.trend-up-good{background:#D1FAE5;color:#065F46}
+.trend-down-bad{background:#FEE2E2;color:#991B1B}
+.metric-good{background:#FEE2E2;color:#991B1B}
+.trend-down-good{background:#D1FAE5;color:#065F46}
+.trend-neutral{background:#F3F4F6;color:#6B7280}
+/* Charts area */
+.charts-row{display:grid;gap:16px;margin-bottom:24px}
+.charts-row-2{grid-template-columns:1fr 300px}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.chart-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px}
+.chart-card-header h3{font-family:'Sora',sans-serif;font-size:15px;font-weight:700}
+.chart-card-header p{font-size:11px;color:var(--text-2);margin-top:2px}
+.chart-toggle{display:flex;border:1.5px solid var(--border);border-radius:6px;overflow:hidden}
+.chart-toggle button{padding:4px 10px;font-size:11px;font-weight:600;border:none;background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif}
+.chart-toggle button.active{background:var(--brand);color:#fff}
+.chart-wrap{height:200px;position:relative;margin-top:12px}
+/* Table */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.data-table td{padding:12px 12px;font-size:13px;border-bottom:1px solid var(--border)}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--bg)}
+/* AI Side Panel */
+.ai-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
+.ai-panel-header{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;margin-bottom:14px}
+.ai-panel-header .ai-icon{font-size:16px}
+.ai-rec-card{background:var(--bg);border-radius:8px;padding:12px;margin-bottom:10px}
+.ai-rec-card h5{font-size:12px;font-weight:700;margin-bottom:2px}
+.ai-rec-card .ai-rec-where{font-size:11px;color:var(--text-2);margin-bottom:6px}
+.ai-rec-metrics{display:flex;gap:12px}
+.ai-rec-metric{font-size:10px}
+.ai-rec-metric label{color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.ai-rec-metric .v{font-weight:700;color:var(--accent);margin-top:1px}
+.ai-rec-metric .v.roi{color:var(--brand)}
+.compliance-card{background:var(--brand);border-radius:8px;padding:14px;color:#fff;margin-top:10px}
+.compliance-card .comp-label{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.65);margin-bottom:6px}
+.compliance-card p{font-size:11px;line-height:1.5;margin-bottom:10px}
+.compliance-card button{width:100%;padding:8px;background:#fff;color:var(--brand);border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif}
+
+/* ════════════════════════════════
+   CALCULATOR PAGE
+════════════════════════════════ */
+.calc-filters{display:flex;gap:12px;margin-bottom:24px;align-items:center;flex-wrap:wrap}
+.calc-filter{display:flex;align-items:center;gap:6px;padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;background:#fff;cursor:pointer}
+.calc-filter select{border:none;background:none;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;outline:none}
+.data-validated{display:flex;align-items:center;gap:6px;padding:8px 14px;border:1.5px solid var(--accent);border-radius:8px;font-size:12px;font-weight:600;color:var(--accent);margin-left:auto}
+.mode-toggle{display:flex;border:1.5px solid var(--border);border-radius:8px;overflow:hidden}
+.mode-toggle button{padding:8px 16px;font-size:12px;font-weight:600;border:none;background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif}
+.mode-toggle button.active{background:var(--brand);color:#fff}
+.scope-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+.scope-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.scope-card-header h3{font-family:'Sora',sans-serif;font-size:16px;font-weight:700}
+.scope-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px}
+.scope-card-sub{font-size:12px;color:var(--text-2);margin-bottom:18px}
+.scope-inputs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.scope-input-group label{font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:4px;display:flex;align-items:center;justify-content:space-between}
+.scope-input-group label span{font-size:10px;background:var(--bg);padding:2px 6px;border-radius:4px;color:var(--text-3)}
+.scope-input-group p{font-size:11px;color:var(--text-3);margin-top:4px}
+.scope-input-group input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;font-weight:600;outline:none;font-family:'DM Mono',monospace;transition:border-color .15s}
+.scope-input-group input:focus{border-color:var(--brand)}
+.scope-add-link{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--brand);cursor:pointer;font-weight:600;margin-top:12px}
+.scope-override{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-2);margin-top:12px}
+.anomaly-alert{background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:10px 14px;font-size:11px;color:#7F1D1D;margin-top:12px;display:flex;gap:8px}
+.anomaly-alert-icon{font-size:14px;flex-shrink:0}
+.scope-upload{text-align:center;padding:40px 20px;border:2px dashed var(--border);border-radius:10px;cursor:pointer}
+.scope-upload-icon{font-size:28px;margin-bottom:8px}
+.scope-upload h4{font-size:13px;font-weight:700;margin-bottom:4px}
+.scope-upload p{font-size:11px;color:var(--text-2);margin-bottom:14px}
+.calc-right{display:flex;flex-direction:column;gap:16px}
+.total-output-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;position:sticky;top:80px}
+.total-output-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);margin-bottom:4px}
+.total-output-value{font-family:'Sora',sans-serif;font-size:36px;font-weight:800;margin-bottom:2px}
+.total-output-unit{font-size:12px;color:var(--text-2);margin-bottom:16px}
+.scope-legend{margin-bottom:16px}
+.scope-legend-item{display:flex;align-items:center;justify-content:space-between;padding:6px 0;font-size:12px;border-bottom:1px solid var(--border)}
+.scope-legend-item:last-child{border-bottom:none}
+.scope-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.scope-legend-label{display:flex;align-items:center;gap:6px}
+.ai-tip{background:var(--brand-light);border-radius:8px;padding:12px;font-size:11px;color:var(--brand-dark);line-height:1.5;margin-bottom:14px}
+.ai-tip strong{display:block;margin-bottom:3px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--brand)}
+.yoy-badge{background:var(--bg);border-radius:8px;padding:10px;text-align:center}
+.yoy-label{font-size:10px;color:var(--text-3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.yoy-value{font-family:'Sora',sans-serif;font-size:20px;font-weight:800;color:var(--accent)}
+.scope3-cats{display:flex;gap:8px;font-size:11px;color:var(--text-2);margin-top:12px}
+.scope3-cat{background:var(--bg);border-radius:6px;padding:4px 10px;font-weight:600}
+.scope3-cat.done{color:var(--accent)}
+.scope3-cat.empty{color:var(--text-3)}
+.accounting-methods{display:flex;gap:6px}
+.acct-btn{padding:8px 14px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;background:#fff;font-family:'DM Sans',sans-serif}
+.acct-btn.active{border-color:var(--brand);background:var(--brand-light);color:var(--brand)}
+/* ── Closure ── */
+.closure-grid{display:grid;grid-template-columns:240px 1fr;gap:20px}
+.closure-left{display:flex;flex-direction:column;gap:0}
+.closure-config{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.closure-config h3{font-family:'Sora',sans-serif;font-size:15px;font-weight:700;margin-bottom:4px}
+.closure-config p{font-size:11px;color:var(--text-2);margin-bottom:18px}
+.form-field{margin-bottom:16px}
+.form-field label{font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:6px;display:block}
+.form-field select,.form-field input[type="date"]{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;background:#fff;outline:none;font-family:'DM Sans',sans-serif;cursor:pointer}
+.intensity-slider{width:100%;accent-color:var(--brand)}
+.slider-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text-3);margin-top:4px}
+.warning-box{background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:10px;font-size:11px;color:#92400E;margin-bottom:16px;display:flex;gap:8px}
+.closure-right{display:flex;flex-direction:column;gap:16px}
+.breadcrumb{font-size:11px;color:var(--text-2);margin-bottom:4px}
+.breadcrumb span{color:var(--brand);cursor:pointer}
+/* ── Scenarios ── */
+.scenarios-grid{display:grid;grid-template-columns:1fr 280px;gap:20px}
+.sim-params{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.sim-params h3{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;margin-bottom:3px}
+.sim-params p{font-size:11px;color:var(--text-2);margin-bottom:16px}
+.param-row{margin-bottom:14px}
+.param-row label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);display:flex;justify-content:space-between;margin-bottom:5px}
+.param-row label span{color:var(--text);font-family:'DM Mono',monospace;font-size:11px}
+.param-row input[type=range]{width:100%;accent-color:var(--brand)}
+.rate-toggle{display:flex;gap:4px;margin-top:6px}
+.rate-btn{padding:5px 10px;border-radius:6px;border:1.5px solid var(--border);font-size:11px;font-weight:600;cursor:pointer;background:#fff;font-family:'DM Sans',sans-serif}
+.rate-btn.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+.add-param-btn{width:100%;padding:8px;border:1.5px dashed var(--border);border-radius:8px;background:#fff;font-size:12px;font-weight:600;color:var(--text-2);cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:4px}
+.ai-strategy-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:12px}
+.ai-strategy-label{font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:12px}
+.ai-strat-card{background:var(--bg);border-radius:8px;padding:12px;margin-bottom:10px}
+.ai-strat-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.ai-strat-card h5{font-size:12px;font-weight:700;margin-bottom:4px}
+.ai-strat-card p{font-size:11px;color:var(--text-2);line-height:1.5;margin-bottom:6px}
+.ai-strat-impact{font-size:11px;font-weight:600;color:var(--brand);display:flex;align-items:center;gap:4px}
+.scenario-set{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:12px}
+.scenario-set h4{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);margin-bottom:10px}
+.scenario-item{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px}
+.scenario-item:last-child{border-bottom:none}
+.scenario-item-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.comparison-table{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px}
+.comparison-table .ct-header{padding:16px 20px;border-bottom:1px solid var(--border)}
+.comparison-table .ct-header h3{font-family:'Sora',sans-serif;font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px}
+/* Reports */
+.reports-grid{display:grid;grid-template-columns:280px 1fr;gap:20px}
+.report-steps{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.report-steps h3{font-family:'Sora',sans-serif;font-size:15px;font-weight:700;margin-bottom:20px}
+.report-step-item{display:flex;align-items:center;gap:10px;padding:10px 0;cursor:pointer}
+.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.step-num.done{background:var(--brand);color:#fff}
+.step-num.active-step{background:var(--brand);color:#fff}
+.step-num.pending{background:var(--bg);color:var(--text-3);border:1.5px solid var(--border)}
+.report-preview{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.report-preview-header{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.live-dot{width:7px;height:7px;background:var(--accent);border-radius:50%;display:inline-block;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.report-doc{padding:32px;background:#fff}
+.report-doc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:20px;border-bottom:2px solid var(--text)}
+.report-doc-title h1{font-family:'Sora',sans-serif;font-size:24px;font-weight:800;margin-top:8px}
+.report-doc-meta{display:flex;gap:16px;margin-top:12px}
+.report-doc-meta-item label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3)}
+.report-doc-meta-item p{font-size:12px;font-weight:600}
+.exec-summary{background:var(--bg);border-radius:10px;padding:20px;margin-bottom:20px}
+.exec-summary h3{font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.exec-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.exec-stat label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3)}
+.exec-stat .v{font-family:'Sora',sans-serif;font-size:22px;font-weight:800;margin-top:2px}
+.audit-table{width:100%;border-collapse:collapse;margin-top:12px}
+.audit-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);padding:8px 0;text-align:left;border-bottom:1px solid var(--border)}
+.audit-table td{font-size:11px;padding:8px 0;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace}
+.verified-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;margin-right:4px}
+/* Regional */
+.regional-grid{display:grid;grid-template-columns:1fr 300px;gap:20px}
+.gov-insight-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
+.gov-insight-card h3{font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.gov-insight-item{padding:12px 0;border-bottom:1px solid var(--border)}
+.gov-insight-item:last-child{border-bottom:none}
+.gov-insight-priority{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+.gov-insight-item p{font-size:11px;color:var(--text-2);line-height:1.5;margin-bottom:4px}
+.gov-insight-link{font-size:11px;font-weight:600;color:var(--brand);cursor:pointer}
+/* Admin */
+.admin-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:24px}
+.admin-tab{padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;color:var(--text-2)}
+.admin-tab.active{color:var(--brand);border-bottom-color:var(--brand)}
+.admin-table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.admin-table-toolbar{padding:14px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.search-input{padding:8px 12px 8px 36px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;background:var(--bg);outline:none;width:220px;position:relative;font-family:'DM Sans',sans-serif}
+.search-wrap{position:relative}
+.search-wrap-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text-3)}
+.admin-warn{background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:12px 16px;font-size:11px;color:#78350F;margin:16px 20px;display:flex;gap:8px}
+
+/* Responsive layout tweaks */
+.calc-layout{display:grid;grid-template-columns:1fr 260px;gap:20px}
+@media(max-width:900px){
+  .calc-layout{grid-template-columns:1fr}
+  .land-hero{grid-template-columns:1fr}
+  .land-features-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+/* === Added improvements === */
+.metric-good{color:var(--accent)!important}
+.metric-neutral{color:var(--text-2)!important}
+.ai-rec-card-enhanced{background:linear-gradient(180deg,#fff 0%, #F8F8FC 100%);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:12px}
+.ai-rec-topline{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.ai-rec-title{font-size:13px;font-weight:700}
+.ai-badges{display:flex;gap:6px;flex-wrap:wrap}
+.ai-rec-desc{font-size:11px;color:var(--text-2);line-height:1.5;margin-bottom:10px}
+.ai-compare{display:grid;grid-template-columns:repeat(2,minmax(220px,1fr));gap:12px;margin-bottom:12px}
+.ai-compare-box{background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px}
+.ai-compare-box h6{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);margin-bottom:6px}
+.ai-compare-box p{font-size:12px;font-weight:700}
+.ai-kpis{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:10px;margin-bottom:12px}
+.ai-kpi{background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px}
+.ai-kpi label{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);margin-bottom:4px}
+.ai-kpi .v{font-size:12px;font-weight:700}
+.ai-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.methodology-card,.data-quality-card,.longterm-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:14px}
+.method-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.method-item{background:var(--bg);border-radius:8px;padding:10px}
+.method-item h5{font-size:11px;margin-bottom:4px}
+.method-item p{font-size:11px;color:var(--text-2);line-height:1.5}
+.dataq-grid,.longterm-grid{display:grid;grid-template-columns:repeat(4,minmax(140px,1fr));gap:12px}
+.kpi-soft{background:var(--bg);border-radius:10px;padding:12px}
+.kpi-soft label{display:block;font-size:10px;text-transform:uppercase;color:var(--text-3);font-weight:700;margin-bottom:5px}
+.kpi-soft .v{font-size:18px;font-weight:800}
+.reco-table-wrap{margin-top:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.reco-table-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.reco-table-head h3{font-size:14px}
+.reco-actions-top{display:flex;gap:8px;flex-wrap:wrap}
+.metric-fixed-good{background:#D1FAE5!important;color:#065F46!important}
+@media(max-width:1100px){
+  .dataq-grid,.longterm-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:820px){
+  .ai-kpis,.dataq-grid,.longterm-grid{grid-template-columns:repeat(2,1fr)}
+  .ai-compare,.method-grid{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+  .ai-kpis,.dataq-grid,.longterm-grid{grid-template-columns:1fr}
+}
+
+
+/* === Sidebar plan cards: landscape layout === */
+.right-panel .ai-rec-card-enhanced,
+.ai-rec-card-enhanced.sidebar-landscape{
+  padding:14px;
+}
+.right-panel .ai-rec-topline{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.right-panel .ai-rec-desc{
+  margin-bottom:10px;
+}
+.right-panel .ai-compare{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin-bottom:10px;
+}
+.right-panel .ai-compare-box{
+  min-width:0;
+  padding:8px;
+}
+.right-panel .ai-compare-box p{
+  font-size:11px;
+  line-height:1.35;
+}
+.right-panel .ai-kpis{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+  margin-bottom:10px;
+}
+.right-panel .ai-kpi{
+  min-width:0;
+  padding:8px 6px;
+}
+.right-panel .ai-kpi .v{
+  font-size:11px;
+  line-height:1.25;
+  word-break:break-word;
+}
+.right-panel .ai-actions{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+.right-panel .ai-actions .btn{
+  justify-content:center;
+  padding:8px 10px;
+  font-size:11px;
+}
+.right-panel .longterm-card{
+  padding:14px;
+}
+.right-panel .longterm-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+.right-panel .kpi-soft{
+  min-width:0;
+  padding:10px 8px;
+}
+.right-panel .kpi-soft .v{
+  font-size:14px;
+  line-height:1.2;
+  word-break:break-word;
+}
+@media(max-width:1200px){
+  .right-panel .ai-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .right-panel .longterm-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .right-panel .ai-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:820px){
+  .right-panel .ai-compare,
+  .right-panel .ai-kpis,
+  .right-panel .longterm-grid,
+  .right-panel .ai-actions{
+    grid-template-columns:1fr;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ════════════ LANDING ════════════ -->
+<div id="screen-landing" class="screen active">
+  <nav class="land-nav">
+    <div class="land-logo">
+      <div class="land-logo-icon"><svg viewBox="0 0 16 16"><path d="M8 2L14 5v6L8 14 2 11V5z"/></svg></div>
+      TerraTrace
+    </div>
+    <div class="land-nav-links">
+      <a>Product</a><a>Solutions</a><a>Methodology</a><a>Pricing</a><a>Resources</a>
+    </div>
+    <div class="land-nav-actions">
+      <button class="btn btn-outline btn-sm" onclick="showSignin()">Login</button>
+      <button class="btn btn-primary btn-sm" onclick="showSignin()">Get Started</button>
+    </div>
+  </nav>
+
+  <div class="land-hero">
+    <div>
+      <div class="land-pill">✦ NEXT-GEN DECARBONIZATION</div>
+      <h1 class="land-h1">Precision Data for <span>Net Zero</span> Operations.</h1>
+      <p class="land-sub">Empower sustainability leaders with AI-backed scenario modeling, real-time ROI analysis, and enterprise-grade carbon accounting.</p>
+      <div class="land-ctas">
+        <button class="btn btn-primary" onclick="showSignin()">Calculate my footprint</button>
+        <button class="btn btn-outline" onclick="showSignin()">Request demo</button>
+      </div>
+      <div class="land-trust">
+        <div class="land-avatars">
+          <span>AL</span><span>KM</span><span>RJ</span>
+        </div>
+        Trusted by <strong>&nbsp;150+&nbsp;</strong> global manufacturing facilities
+      </div>
+    </div>
+    <div>
+      <div class="land-dash-card">
+        <div class="land-dash-header">● LIVE SCENARIO DASHBOARD</div>
+        <div class="land-dash-metrics">
+          <div class="land-dash-metric">
+            <label>PROJECTIONS</label>
+            <div class="val">24.8%</div>
+          </div>
+          <div class="land-dash-metric">
+            <label>EMISSIONS ENGINE</label>
+            <div class="val red">1,420t</div>
+          </div>
+        </div>
+        <div style="height:1px;background:var(--border);margin-bottom:12px"></div>
+        <div class="land-dash-ai">
+          <strong>✦ AI SUGGESTION</strong>
+          Upgrade Compressor A4 to Variable Speed for immediate 8.3 month payback.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="land-partners" style="background:var(--bg)">
+    <p>Certified Compliant with IPCC & GHG Protocol Standards</p>
+    <div class="land-partner-logos">
+      <span>⬡ GLOBAL-TEX</span>
+      <span>⚡ ENERGIZE</span>
+      <span>🔒 SECURE-FAB</span>
+      <span>↗ SCALE-IND</span>
+      <span>≋ DATA-FLOW</span>
+    </div>
+  </div>
+
+  <div class="land-features">
+    <div class="land-section-label">UNIFIED PLATFORM</div>
+    <h2 class="land-h2">Unified Sustainability Infrastructure</h2>
+    <p class="land-h2-sub">Replace fragmented spreadsheets with a single source of truth for all environmental modeling and reporting.</p>
+    <div class="land-features-grid">
+      <div class="card land-feat-card">
+        <div class="land-feat-icon">🧮</div>
+        <h4>Smart Calculator</h4>
+        <p>High-precision CO2e calculation with real-time IPCC emission factor integration and CSV bulk import.</p>
+        <a onclick="showSignin()">Explore Module →</a>
+      </div>
+      <div class="card land-feat-card">
+        <div class="land-feat-icon">🏭</div>
+        <h4>Closure Impact</h4>
+        <p>Model the complex environmental shifts of facility closures, accounting for one-time costs and avoided emissions.</p>
+        <a onclick="showSignin()">Explore Module →</a>
+      </div>
+      <div class="card land-feat-card">
+        <div class="land-feat-icon">📈</div>
+        <h4>ROI Engine</h4>
+        <p>Validate scenario profitability with automated payback periods and cost-benefit visualizations.</p>
+        <a onclick="showSignin()">Explore Module →</a>
+      </div>
+      <div class="card land-feat-card">
+        <div class="land-feat-icon">✦</div>
+        <h4>AI Suggestions</h4>
+        <p>Rule-based and neural-powered recommendations tailored to your specific facility and equipment data.</p>
+        <a onclick="showSignin()">Explore Module →</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="land-steps">
+    <div class="land-steps-inner">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px">
+        <div>
+          <h2 class="land-h2" style="text-align:left">From Raw Data to<br>Actionable<br><span style="color:var(--brand)">Intelligence.</span></h2>
+          <p style="font-size:14px;color:var(--text-2);max-width:380px;margin-top:10px">We've compressed the complex journey of corporate decarbonization into a repeatable, high-accuracy workflow.</p>
+        </div>
+        <a class="land-steps-header learn-more">Learn about our methodology →</a>
+      </div>
+      <div class="land-steps-grid">
+        <div class="land-step">
+          <div class="land-step-num">01</div>
+          <h4>Data Input & Baseline</h4>
+          <p>Seamlessly aggregate energy, waste, and logistics data through our intuitive manual forms or high-volume CSV uploads.</p>
+        </div>
+        <div class="land-step">
+          <div class="land-step-num">02</div>
+          <h4>Scenario Modeling</h4>
+          <p>Simulate equipment upgrades, fuel switches, or operational changes to see real-time impact on your carbon trajectory.</p>
+        </div>
+        <div class="land-step">
+          <div class="land-step-num">03</div>
+          <h4>Actionable ROI</h4>
+          <p>Receive automated business cases and government-ready reports to secure funding and ensure compliance.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:0 48px;margin:60px auto;max-width:1100px">
+    <div class="land-ai">
+      <div>
+        <div class="land-ai-label">✦ AI SUGGESTION ENGINE</div>
+        <h2>Decisions powered by domain intelligence.</h2>
+        <p style="font-size:13px;color:rgba(255,255,255,.75);margin-bottom:16px">It doesn't just calculate numbers — it scans your facility data and recommends interventions based on global best practices and regional emission factors.</p>
+        <ul class="land-ai-bullets">
+          <li>Automated equipment replacement triggers</li>
+          <li>Cross-facility emission benchmarking</li>
+          <li>Predictive regulatory compliance alerts</li>
+          <li>Optimized facility closure sequencing</li>
+        </ul>
+        <button class="btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3)" onclick="showSignin()">See AI in Action</button>
+      </div>
+      <div class="land-ai-cards">
+        <div class="land-ai-card">
+          <div class="land-ai-card-label">HVAC SYSTEM A1</div>
+          <h5>Upgrade to Heat Pump</h5>
+          <p>Saves 450 t/e Annually</p>
+          <span class="ai-tag">ROI: 14 Months</span>
+        </div>
+        <div class="land-ai-card">
+          <div class="land-ai-card-label">LOGISTICS FLEET</div>
+          <h5>Biofuel Transition</h5>
+          <p>Saves 620 t CO2e/yr</p>
+          <span class="ai-tag">Saves $31k/yr</span>
+        </div>
+        <div class="land-ai-card">
+          <div class="land-ai-card-label">FACILITY CLOSURE</div>
+          <h5>Decommission Warehouse 4</h5>
+          <span class="ai-tag">AI Recommendation Pack</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="land-cta-section">
+    <h2>Ready to map your path to Net Zero?</h2>
+    <p>Join leading organizations using TerraTrace to turn environmental obligations into operational advantages.</p>
+    <div class="cta-btns">
+      <button class="btn btn-primary" onclick="showSignin()">Start free calculation</button>
+      <button class="btn btn-outline" onclick="showSignin()">Talk to an expert</button>
+    </div>
+    <p class="fine-print">No credit card required. ISO 14064 compliant reporting by default.</p>
+  </div>
+
+  <div class="land-footer">
+    <div class="land-footer-brand">
+      <div class="land-logo"><div class="land-logo-icon"><svg viewBox="0 0 16 16"><path d="M8 2L14 5v6L8 14 2 11V5z"/></svg></div>TerraTrace</div>
+      <p>Empowering organizations with data-driven decarbonization tools and AI-backed scenario modeling.</p>
+    </div>
+    <div class="land-footer-col"><h5>Product</h5><a>Calculator</a><a>ROI Engine</a><a>Compliance</a><a>API Access</a></div>
+    <div class="land-footer-col"><h5>Company</h5><a>About Us</a><a>Methodology</a><a>Sustainability</a><a>Careers</a></div>
+    <div class="land-footer-col"><h5>Contact</h5><a>support@terratrace.com</a><a>+1 (345) 123-4567</a><a>San Francisco, CA</a></div>
+  </div>
+  <div class="land-footer-bottom">
+    <span>© 2024 TerraTrace. An ISO 14064 Certified Platform.</span>
+    <div class="land-footer-social"><a>Twitter</a><a>LinkedIn</a><a>GitHub</a></div>
+  </div>
+</div>
+
+<!-- ════════════ SIGN IN ════════════ -->
+<div id="screen-signin" class="screen">
+  <div class="signin-left">
+    <div>
+      <div class="signin-left-logo"><div class="signin-left-logo-icon">🌿</div>TerraTrace</div>
+      <h2>Master your <span>carbon footprint</span> with AI precision.</h2>
+      <div class="signin-feat">
+        <div class="signin-feat-icon">🛡️</div>
+        <div><h5>Compliance Ready</h5><p>Built-in frameworks for IPCC, DEFRA, and EPA reporting standards.</p></div>
+      </div>
+      <div class="signin-feat">
+        <div class="signin-feat-icon">⚙️</div>
+        <div><h5>Scenario Modeling</h5><p>Model facility closures and equipment upgrades with real-time ROI analysis.</p></div>
+      </div>
+      <div class="signin-feat">
+        <div class="signin-feat-icon">✦</div>
+        <div><h5>AI Suggestions</h5><p>Get rule-based and AI-driven recommendations for immediate impact.</p></div>
+      </div>
+    </div>
+    <div class="signin-left-footer">
+      <span>© 2024 TerraTrace Platform</span>
+      <span><a style="color:inherit;cursor:pointer">Security</a> &nbsp; <a style="color:inherit;cursor:pointer">Privacy</a></span>
+    </div>
+  </div>
+  <div class="signin-right">
+    <div class="signin-form">
+      <h2>Sign In</h2>
+      <p>Access your environmental dashboard</p>
+      <button class="signin-social-btn" onclick="doLogin()">🔲 Continue with Google</button>
+      <button class="signin-social-btn" onclick="doLogin()">Ⓐ Continue with Azure AD</button>
+      <div class="signin-divider"><span>OR CONTINUE WITH EMAIL</span></div>
+      <div class="form-group">
+        <label>Work Email</label>
+        <input type="email" placeholder="name@company.com">
+      </div>
+      <div class="form-group">
+        <label>Password <a>Forgot password?</a></label>
+        <input type="password" placeholder="">
+      </div>
+      <button class="signin-submit" onclick="doLogin()">Sign In</button>
+      <div class="signin-footer-note">Don't have an account? <a onclick="doLogin()">Request access</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ APP ════════════ -->
+<div id="screen-app" class="screen">
+  <header class="app-header">
+    <div class="app-logo" onclick="showPage('dashboard')">
+      <div class="app-logo-icon">🌿</div>TerraTrace
+    </div>
+    <div class="app-search">
+      <span class="app-search-icon">🔍</span>
+      <input type="text" placeholder="Search reports, facilities, or data...">
+    </div>
+    <div class="app-header-right">
+      <div class="app-notif">🔔<div class="app-notif-dot"></div></div>
+      <div class="app-user">
+        <div class="app-user-avatar">AR</div>
+        <div class="app-user-info">
+          <div class="app-user-name">Alex Rivera</div>
+          <div class="app-user-role">Company</div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="app-body">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <div class="sidebar-nav">
+        <div class="sidebar-item active" onclick="showPage('dashboard')" id="nav-dashboard">
+          <span class="icon">📊</span> Dashboard
+        </div>
+        <div class="sidebar-item" onclick="showPage('calculators')" id="nav-calculators">
+          <span class="icon">🧮</span> Calculators
+        </div>
+        <div class="sidebar-item" onclick="showPage('closure')" id="nav-closure">
+          <span class="icon">🏭</span> Closure Impact
+        </div>
+        <div class="sidebar-item" onclick="showPage('scenarios')" id="nav-scenarios">
+          <span class="icon">↗</span> Scenarios & ROI
+        </div>
+        <div class="sidebar-item" onclick="showPage('reports')" id="nav-reports">
+          <span class="icon">📄</span> Reports & Exports
+        </div>
+      </div>
+      <div class="sidebar-bottom">
+        <div class="sidebar-ai-insight">
+          <div class="ai-label">✦ AI INSIGHT</div>
+          <p>New suggestion available for Facility A: Switch to LED lighting for 12% CO2e reduction.</p>
+        </div>
+        <div class="sidebar-settings">⚙️ Settings</div>
+        <div class="sidebar-logout" onclick="showLanding()">↩ Logout</div>
+      </div>
+      <div class="sidebar-collapse">‹</div>
+    </nav>
+
+    <!-- Main content area -->
+    <main class="main-content">
+
+      <!-- ── DASHBOARD ── -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <div class="page-title">
+            <h1>Company Dashboard</h1>
+            <p>Real-time environmental performance overview for Global Corp.</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-outline btn-sm">⬇ Export Data</button>
+            <button class="btn btn-primary btn-sm">+ New Calculation</button>
+          </div>
+        </div>
+        <div class="stat-row stat-row-4">
+          <div class="stat-card">
+            <div class="stat-card-label">Total Annual CO2e</div>
+            <div class="stat-trend trend-down-good">↘ 8.4%</div>
+            <div class="stat-card-value">24,102.5 t</div>
+            <div class="stat-card-sub">Vs. 26,310 t last year</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">CO2e Per Unit</div>
+            <div class="stat-trend trend-down-good">↘ 12.1%</div>
+            <div class="stat-card-value">12.4 kg</div>
+            <div class="stat-card-sub">Efficiency target: 11.5 kg</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Renewable Share</div>
+            <div class="stat-trend metric-good">↑ 15.2%</div>
+            <div class="stat-card-value">42.8%</div>
+            <div class="stat-card-sub">+12 GWh from solar projects</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Projected Savings</div>
+            <div class="badge badge-red" style="margin-bottom:6px">↘ Low</div>
+            <div class="stat-card-value">$142,500</div>
+            <div class="stat-card-sub">Based on 3 active scenarios</div>
+          </div>
+        </div>
+
+        <div class="charts-row charts-row-2">
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <h3>Emissions Trends</h3>
+                <p>Monthly metric tons of CO2e comparison</p>
+              </div>
+              <div class="chart-toggle">
+                <button class="active">YTD</button>
+                <button>12 Months</button>
+              </div>
+            </div>
+            <div class="chart-wrap"><canvas id="emissionsChart"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div><h3>Scope Breakdown</h3><p>Distribution across reporting scopes</p></div>
+            </div>
+            <div class="chart-wrap"><canvas id="scopeDonut"></canvas></div>
+            <div style="margin-top:12px">
+              <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0"><span>● Scope 1</span><span style="font-weight:700">25%</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0"><span style="color:var(--danger)">● Scope 2</span><span style="font-weight:700">35%</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0"><span style="color:var(--accent)">● Scope 3</span><span style="font-weight:700">40%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 280px;gap:16px;margin-bottom:20px">
+          <div>
+            <div class="card" style="margin-bottom:16px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+                <div><h3 style="font-family:'Sora',sans-serif;font-size:15px;font-weight:700">Operational Facilities</h3><p style="font-size:11px;color:var(--text-2)">Top emitters and site-specific performance</p></div>
+                <div style="display:flex;gap:8px"><button class="btn btn-outline btn-sm">⊛ Filter</button><button class="btn btn-outline btn-sm">View All</button></div>
+              </div>
+              <table class="data-table">
+                <thead><tr><th>Facility Name</th><th>Region</th><th>Status</th><th>CO2e (t)</th><th>YoY %</th></tr></thead>
+                <tbody>
+                  <tr><td>🏢 Northeast Manufacturing Hub</td><td>New York, USA</td><td><span class="badge badge-green">Active</span></td><td>1,240</td><td style="color:var(--accent);font-weight:600">-5.2%</td></tr>
+                  <tr><td>🏢 Pacific Rim Assembly</td><td>Hanoi, VN</td><td><span class="badge badge-orange">Review Needed</span></td><td>2,890</td><td style="color:var(--danger);font-weight:600">+2.1%</td></tr>
+                  <tr><td>🏢 Euro Distribution Center</td><td>Berlin, DE</td><td><span class="badge badge-green">Active</span></td><td>840</td><td style="color:var(--accent);font-weight:600">-12.4%</td></tr>
+                  <tr><td>🏢 Southern Logistics Wing</td><td>Austin, TX</td><td><span class="badge badge-green">Active</span></td><td>1,120</td><td style="color:var(--accent);font-weight:600">-1.8%</td></tr>
+                  <tr><td>🏢 Alpine R&D Center</td><td>Zurich, CH</td><td><span class="badge badge-gray">Closed</span></td><td>0</td><td style="color:var(--accent);font-weight:600">-100%</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+                <div><h3 style="font-family:'Sora',sans-serif;font-size:15px;font-weight:700">Active ROI Scenarios</h3><p style="font-size:11px;color:var(--text-2)">Recently modeled decarbonization strategies</p></div>
+                <span style="font-size:18px;color:var(--text-3);cursor:pointer">···</span>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div style="background:var(--bg);border-radius:8px;padding:14px;display:flex;gap:10px">
+                  <div style="width:32px;height:32px;background:var(--brand-light);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">↗</div>
+                  <div><div style="font-size:13px;font-weight:700">2025 Solar Expansion</div><div style="font-size:11px;color:var(--text-2)">ROI: 3.4 yrs • -450t CO2e</div></div>
+                  <span class="badge badge-blue" style="margin-left:auto;align-self:flex-start">IN PROGRESS</span>
+                </div>
+                <div style="background:var(--bg);border-radius:8px;padding:14px;display:flex;gap:10px">
+                  <div style="width:32px;height:32px;background:var(--brand-light);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">↗</div>
+                  <div><div style="font-size:13px;font-weight:700">Boiler Replacement Alpha</div><div style="font-size:11px;color:var(--text-2)">ROI: 1.2 yrs • -120t CO2e</div></div>
+                  <span class="badge badge-gray" style="margin-left:auto;align-self:flex-start">DRAFT</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="ai-panel">
+            <div class="ai-panel-header"><span class="ai-icon">✦</span> AI Suggestions</div>
+            <div class="ai-rec-card">
+              <h5>Switch to HVLS Fans</h5>
+              <div class="ai-rec-where">Northeast Hub</div>
+              <div class="ai-rec-metrics">
+                <div class="ai-rec-metric"><label>REDUCTION</label><div class="v">-12%</div></div>
+                <div class="ai-rec-metric"><label>ROI</label><div class="v roi">1.4 Years</div></div>
+              </div>
+            </div>
+            <div class="ai-rec-card">
+              <h5>On-site Solar (Phase 2)</h5>
+              <div class="ai-rec-where">Pacific Rim Assembly</div>
+              <div class="ai-rec-metrics">
+                <div class="ai-rec-metric"><label>REDUCTION</label><div class="v">-34%</div></div>
+                <div class="ai-rec-metric"><label>ROI</label><div class="v roi">4.2 Years</div></div>
+              </div>
+            </div>
+            <div class="ai-rec-card">
+              <h5>EV Fleet Transition</h5>
+              <div class="ai-rec-where">Global Logistics</div>
+              <div class="ai-rec-metrics">
+                <div class="ai-rec-metric"><label>REDUCTION</label><div class="v">-22%</div></div>
+                <div class="ai-rec-metric"><label>ROI</label><div class="v roi">3.1 Years</div></div>
+              </div>
+            </div>
+            
+<div class="ai-rec-card-enhanced">
+  <div class="ai-rec-topline">
+    <div class="ai-rec-title">HVAC System A1 → High-Efficiency Heat Pump</div>
+    <div class="ai-badges">
+      <span class="badge badge-green">Priority: High</span>
+      <span class="badge badge-blue">Confidence: 91%</span>
+      <span class="badge badge-orange">Risk: Medium</span>
+    </div>
+  </div>
+  <div class="ai-rec-desc">Rule-based and AI-assisted recommendation based on high Scope 2 intensity, aging equipment profile, and above-benchmark electricity usage.</div>
+  <div class="ai-compare">
+    <div class="ai-compare-box">
+      <h6>Current</h6>
+      <p>Standard Gas Boiler (2012)</p>
+      <div style="font-size:11px;color:var(--text-2)">High maintenance · Lower efficiency · Higher emissions</div>
+    </div>
+    <div class="ai-compare-box">
+      <h6>Better Alternative</h6>
+      <p>Smart Heat Pump Upgrade</p>
+      <div style="font-size:11px;color:var(--text-2)">Electrified · Smart controls · Lower lifecycle emissions</div>
+    </div>
+  </div>
+  <div class="ai-kpis">
+    <div class="ai-kpi"><label>Capex</label><div class="v">$450k</div></div>
+    <div class="ai-kpi"><label>Annual Savings</label><div class="v">$96k</div></div>
+    <div class="ai-kpi"><label>CO2e Reduced</label><div class="v">1,240 t/yr</div></div>
+    <div class="ai-kpi"><label>Payback</label><div class="v">4.7 yrs</div></div>
+  </div>
+  <div class="ai-actions">
+    <button class="btn btn-outline btn-sm">Compare</button>
+    <button class="btn btn-outline btn-sm">Simulate</button>
+    <button class="btn btn-primary btn-sm">Generate Proposal</button>
+  </div>
+</div>
+
+<div class="longterm-card">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+    <h3 style="font-size:14px">Long-Term Value Snapshot</h3>
+    <span class="badge badge-purple">10-Year Horizon</span>
+  </div>
+  <div class="longterm-grid">
+    <div class="kpi-soft"><label>1-Year Savings</label><div class="v">$96k</div></div>
+    <div class="kpi-soft"><label>5-Year Savings</label><div class="v">$480k</div></div>
+    <div class="kpi-soft"><label>10-Year Savings</label><div class="v">$1.12M</div></div>
+    <div class="kpi-soft"><label>10-Year CO2e Avoided</label><div class="v">12,400 t</div></div>
+  </div>
+</div>
+
+<div class="data-quality-card">
+  <h3 style="font-size:14px;margin-bottom:10px">Data Quality & Methodology</h3>
+  <div class="dataq-grid">
+    <div class="kpi-soft"><label>Data Completeness</label><div class="v">94%</div></div>
+    <div class="kpi-soft"><label>Estimated vs Actual</label><div class="v">18% est.</div></div>
+    <div class="kpi-soft"><label>Validation Status</label><div class="v">Verified</div></div>
+    <div class="kpi-soft"><label>Audit Trail</label><div class="v">Available</div></div>
+  </div>
+  <div class="method-grid" style="margin-top:12px">
+    <div class="method-item">
+      <h5>Calculation Logic</h5>
+      <p>CO2e = Activity Data × Emission Factor. Scope 1 uses direct fuel factors, Scope 2 uses grid factors, and Scope 3 uses spend-based estimates from uploaded ledgers.</p>
+    </div>
+    <div class="method-item">
+      <h5>Methodology Source</h5>
+      <p>Supports DEFRA, EPA, and IPCC-style factor libraries with location-based or market-based electricity accounting and scenario comparison over time.</p>
+    </div>
+  </div>
+</div>
+
+<div class="compliance-card">
+              <div class="comp-label">✔ COMPLIANCE READY</div>
+              <p>Your Q3 data aligns with SECR standards. Generate your final report bundle now.</p>
+              <button onclick="showPage('reports')">Generate Report</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CALCULATORS ── -->
+      <div class="page" id="page-calculators">
+        <div class="page-header">
+          <div class="page-title">
+            <h1>Carbon Footprint Calculator</h1>
+            <p>Manage your environmental impact by quantifying emissions across Scopes 1, 2, and 3.</p>
+          </div>
+          <div class="page-actions">
+            <div class="mode-toggle">
+              <button>Quick Mode</button>
+              <button class="active">Detailed Audit</button>
+            </div>
+          </div>
+        </div>
+        <div class="calc-filters">
+          <div class="calc-filter">🏢 <select><option>Austin Headquarters (HQ)</option><option>Northeast Manufacturing Hub</option><option>Pacific Rim Assembly</option></select></div>
+          <div class="calc-filter">🕐 <select><option>Q3 2023 (July - Sept)</option><option>Q4 2023</option><option>Q1 2024</option></select></div>
+          <div class="calc-filter">✓ <select><option>UK DEFRA (2023)</option><option>EPA 2023</option><option>IPCC AR6</option></select></div>
+          <div class="data-validated">✓ Data Validated</div>
+        </div>
+        <div class="calc-layout">
+          <div>
+            <!-- Scope 1 -->
+            <div class="scope-card">
+              <div class="scope-card-header">
+                <h3>Scope 1: Direct Emissions ⓘ</h3>
+                <span class="badge badge-purple scope-badge">1,700 MT CO2e</span>
+              </div>
+              <div class="scope-card-sub">Combustion, mobile fuel, and refrigerants</div>
+              <div class="scope-inputs">
+                <div class="scope-input-group">
+                  <label>Stationary Combustion <span>kWh / therms</span></label>
+                  <input type="number" value="1250" oninput="updateCalc()">
+                  <p>Natural gas usage for heating and power</p>
+                </div>
+                <div class="scope-input-group">
+                  <label>Mobile Combustion <span>Liters / Gals</span></label>
+                  <input type="number" value="450" oninput="updateCalc()">
+                  <p>Corporate fleet fuel consumption</p>
+                </div>
+              </div>
+              <div class="scope-add-link">+ Add Fugitive Emissions</div>
+              <div class="scope-override"><input type="checkbox" style="width:auto"> Apply custom override</div>
+            </div>
+            <!-- Scope 2 -->
+            <div class="scope-card">
+              <div class="scope-card-header">
+                <h3>Scope 2: Indirect Emissions ⓘ</h3>
+                <span class="badge badge-red scope-badge">8,900 MT CO2e</span>
+              </div>
+              <div class="scope-card-sub">Purchased electricity, steam, and heat</div>
+              <div class="scope-inputs">
+                <div class="scope-input-group">
+                  <label>Grid Electricity <span>MWh</span></label>
+                  <input type="number" value="8900" oninput="updateCalc()">
+                  <p>Facility-wide electricity consumption</p>
+                </div>
+                <div class="scope-input-group">
+                  <label>Accounting Method</label>
+                  <div class="accounting-methods" style="margin-top:4px">
+                    <button class="acct-btn active">Location-based</button>
+                    <button class="acct-btn">Market-based</button>
+                  </div>
+                  <p style="margin-top:6px">Based on Austin Energy grid emission factors.</p>
+                </div>
+              </div>
+              <div class="anomaly-alert">
+                <span class="anomaly-alert-icon">⚠</span>
+                <div><strong>Anomaly Detected:</strong> Electricity usage for September is 32% above the 12-month rolling average. Please verify if production lines were expanded.</div>
+              </div>
+            </div>
+            <!-- Scope 3 -->
+            <div class="scope-card">
+              <div class="scope-card-header">
+                <h3>Scope 3: Value Chain ⓘ</h3>
+                <span class="badge badge-green scope-badge">800 MT CO2e</span>
+              </div>
+              <div class="scope-card-sub">Purchased goods and upstream activities</div>
+              <div class="scope-upload">
+                <div class="scope-upload-icon">⬆</div>
+                <h4>Bulk Upload Scope 3 Data</h4>
+                <p>Upload your supply chain ledger (CSV/XLSX) to auto-calculate Scope 3 categories using spend-based factors.</p>
+                <div style="display:flex;gap:8px;justify-content:center">
+                  <button class="btn btn-outline btn-sm">Download Template</button>
+                  <button class="btn btn-primary btn-sm">Choose File</button>
+                </div>
+              </div>
+              <div class="scope3-cats">
+                <span class="scope3-cat done">1 Purchased Goods</span>
+                <span class="scope3-cat empty">0 Business Travel</span>
+                <a style="font-size:11px;color:var(--brand);cursor:pointer;font-weight:600;margin-left:auto">Add more categories</a>
+              </div>
+            </div>
+          </div>
+          <div class="calc-right">
+            <div class="total-output-card">
+              <div class="total-output-label">TOTAL CO2E OUTPUT</div>
+              <div class="total-output-value" id="total-co2e">11,400</div>
+              <div class="total-output-unit">metric tons</div>
+              <div style="height:160px"><canvas id="calcDonut"></canvas></div>
+              <div class="scope-legend">
+                <div class="scope-legend-item">
+                  <div class="scope-legend-label"><div class="scope-legend-dot" style="background:var(--brand)"></div>Scope 1</div>
+                  <span style="font-weight:700">15%</span>
+                </div>
+                <div class="scope-legend-item">
+                  <div class="scope-legend-label"><div class="scope-legend-dot" style="background:var(--danger)"></div>Scope 2</div>
+                  <span style="font-weight:700">78%</span>
+                </div>
+                <div class="scope-legend-item">
+                  <div class="scope-legend-label"><div class="scope-legend-dot" style="background:var(--accent)"></div>Scope 3</div>
+                  <span style="font-weight:700">7%</span>
+                </div>
+              </div>
+              <div class="ai-tip"><strong>✦ AI TIP</strong>Your Scope 2 emissions are 14% higher than regional benchmarks. Consider a REC Purchase to zero-out this category.</div>
+              <div style="display:flex;gap:8px;margin-bottom:12px">
+                <button class="btn btn-primary" style="flex:1;font-size:12px">💾 Save</button>
+                <button class="btn btn-outline" style="flex:1;font-size:12px">📤 Export</button>
+              </div>
+              <div class="yoy-badge">
+                <div class="yoy-label">YOY COMPARISON</div>
+                <div class="yoy-value">4.2% Reduction</div>
+                <div style="font-size:10px;color:var(--text-2)">vs Q3 2022</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CLOSURE IMPACT ── -->
+      <div class="page" id="page-closure">
+        <div class="breadcrumb"><span>Planning</span> › Facility Closure</div>
+        <div class="page-header">
+          <div class="page-title">
+            <h1>🏭 Facility Closure Impact Modeling</h1>
+            <p>Analyze long-term carbon avoidance vs. immediate decommissioning penalties.</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-outline btn-sm">✉ Share</button>
+            <button class="btn btn-outline btn-sm">📤 Export</button>
+            <button class="btn btn-primary btn-sm">🖨 Print Report</button>
+          </div>
+        </div>
+        <div class="closure-grid">
+          <div>
+            <div class="closure-config">
+              <h3>Closure Assumptions</h3>
+              <p>Configure decommissioning variables</p>
+              <div class="form-field">
+                <label>Select Facility</label>
+                <select><option>St. Louis Distribution Hub</option><option>Alpine R&D Center</option><option>Pacific Rim Assembly</option></select>
+              </div>
+              <div class="form-field">
+                <label>Projected Closure Date</label>
+                <input type="date" value="2025-06-30">
+              </div>
+              <div class="form-field">
+                <label>Decommissioning Intensity</label>
+                <input type="range" class="intensity-slider" min="0" max="100" value="30">
+                <div class="slider-labels"><span>LOW IMPACT</span><span>FAST (HIGH PEAK)</span></div>
+              </div>
+              <div class="form-field">
+                <label>Waste Management Policy</label>
+                <select><option>Asset Circularity (AI Optimized)</option><option>Standard Demolition</option><option>Phased Deconstruction</option></select>
+              </div>
+              <div class="warning-box">
+                <span>⚠</span>
+                <div>Rapid decommissioning increases short-term emissions by ~22%. Phased closure is recommended.</div>
+              </div>
+              <button class="btn btn-primary" style="width:100%;justify-content:center">⟳ Recalculate Impact</button>
+            </div>
+          </div>
+          <div class="closure-right">
+            <div class="stat-row stat-row-4">
+              <div class="stat-card">
+                <div class="stat-card-label">Avoided Annual Emissions</div>
+                <div class="badge badge-green" style="margin-bottom:6px">↘ High Impact</div>
+                <div class="stat-card-value" style="font-size:22px">4,200 tCO2e/yr</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-label">One-Time Closure Cost</div>
+                <div class="badge badge-orange" style="margin-bottom:6px">Transition Cost</div>
+                <div class="stat-card-value" style="font-size:22px">1,600 tCO2e</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-label">Net 5-Year Reduction</div>
+                <div class="badge badge-green" style="margin-bottom:6px">↘ High Impact</div>
+                <div class="stat-card-value" style="font-size:22px">19,400 tCO2e</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-label">Carbon Payback Period</div>
+                <div class="stat-card-sub" style="margin-bottom:6px">Estimate</div>
+                <div class="stat-card-value" style="font-size:22px">4.6 Months</div>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div><h3>Emissions Trajectory: Baseline vs. Closure</h3><p>Projection of carbon footprint through 2028</p></div>
+                <span style="font-size:11px;background:var(--bg);padding:4px 10px;border-radius:6px;font-weight:600">tCO2e / Year</span>
+              </div>
+              <div style="height:240px;margin-top:12px"><canvas id="closureChart"></canvas></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+              <div class="card">
+                <div style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--brand);margin-bottom:8px">✦ AI SUGGESTION ENGINE</div>
+                <div style="display:flex;gap:10px;margin-bottom:10px">
+                  <div style="width:36px;height:36px;background:var(--brand-light);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📈</div>
+                  <div><h4 style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700">Phased Asset Liquidation Strategy</h4></div>
+                </div>
+                <p style="font-size:12px;color:var(--text-2);line-height:1.6;margin-bottom:10px">By implementing a 'Deconstruction for Reuse' model instead of traditional demolition, you can recover approximately <strong>850 tCO2e</strong> embedded in structural steel.</p>
+                <div style="display:flex;gap:6px;margin-bottom:10px">
+                  <span class="badge badge-green">Avoids 12% Peak</span>
+                  <span class="badge badge-blue">Circular Economy Focus</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                  <span style="font-size:11px;color:var(--text-2)">Confidence Score</span>
+                  <span style="font-size:12px;font-weight:700;color:var(--brand)">94%</span>
+                </div>
+                <div style="height:6px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="height:100%;width:94%;background:var(--brand);border-radius:3px"></div></div>
+                <a style="font-size:12px;color:var(--brand);cursor:pointer;font-weight:600;display:block;text-align:center;margin-top:12px">View Detailed Plan →</a>
+              </div>
+              <div class="card">
+                <h4 style="font-family:'Sora',sans-serif;font-size:14px;font-weight:700;margin-bottom:4px">🌿 Scope Breakdown by Method</h4>
+                <p style="font-size:11px;color:var(--text-2);margin-bottom:14px">Comparison of decommissioning strategies</p>
+                <table class="data-table">
+                  <thead><tr><th>Method</th><th>Scope 1</th><th>Scope 2</th><th>Waste</th></tr></thead>
+                  <tbody>
+                    <tr><td>Standard Demolition</td><td>840</td><td>120</td><td>2,500</td></tr>
+                    <tr><td>Phased Deconstruction</td><td>420</td><td>85</td><td>450</td></tr>
+                    <tr><td>Rapid Asset Transfer</td><td>1,100</td><td>150</td><td>1,800</td></tr>
+                  </tbody>
+                </table>
+                <a style="font-size:12px;color:var(--brand);cursor:pointer;font-weight:600;display:block;margin-top:12px">View Detailed Methodology</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SCENARIOS & ROI ── -->
+      <div class="page" id="page-scenarios">
+        <div class="page-header">
+          <div class="page-title">
+            <div style="font-size:11px;color:var(--text-2);margin-bottom:4px">PLANNING › EQUIPMENT REPLACEMENT</div>
+            <h1>Scenarios & ROI Analysis</h1>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-outline btn-sm">⤢ Share</button>
+            <button class="btn btn-outline btn-sm">⬇ Export Report</button>
+            <button class="btn btn-primary btn-sm">+ Create Scenario</button>
+          </div>
+        </div>
+        <div class="stat-row stat-row-4">
+          <div class="stat-card">
+            <div class="stat-card-label">Simple Payback</div>
+            <div class="badge badge-green" style="margin-bottom:6px">-15% vs target</div>
+            <div class="stat-card-value">4.2 <span style="font-size:14px;font-weight:500">YEARS</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Net Present Value</div>
+            <div class="badge badge-green" style="margin-bottom:6px">+12% ROI</div>
+            <div class="stat-card-value" style="font-size:22px">$184,200 <span style="font-size:11px;font-weight:500">USD (10Y)</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Carbon Abatement</div>
+            <div class="badge badge-green" style="margin-bottom:6px">-28% reduction</div>
+            <div class="stat-card-value" style="font-size:22px">1,240 <span style="font-size:11px;font-weight:500">tCO2e/YEAR</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-label">Internal Rate of Return</div>
+            <div class="badge badge-gray" style="margin-bottom:6px">⚡</div>
+            <div class="stat-card-value">18.4 <span style="font-size:14px;font-weight:500">%</span></div>
+          </div>
+        </div>
+        <div class="scenarios-grid">
+          <div>
+            <div class="chart-card" style="margin-bottom:16px">
+              <div class="chart-card-header">
+                <div><h3>Cash Flow & Break-Even Analysis</h3><p>Comparison of cumulative financial impact over a 10-year horizon</p></div>
+                <div class="chart-toggle"><button class="active">Cumulative</button><button>Annual</button></div>
+              </div>
+              <div style="height:220px;margin-top:12px"><canvas id="cashflowChart"></canvas></div>
+            </div>
+            
+<div class="reco-table-wrap">
+  <div class="reco-table-head">
+    <h3>AI Alternative Recommendation Engine</h3>
+    <div class="reco-actions-top">
+      <button class="btn btn-outline btn-sm">Export Proposal</button>
+      <button class="btn btn-primary btn-sm">Apply Recommendation</button>
+    </div>
+  </div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Current Asset</th>
+        <th>Suggested Alternative</th>
+        <th>Capex</th>
+        <th>Annual Savings</th>
+        <th>CO2e Saved/Yr</th>
+        <th>ROI</th>
+        <th>Confidence</th>
+        <th>Risk</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Gas Boiler (2012)</td>
+        <td style="color:var(--brand);font-weight:700">High-Efficiency Heat Pump</td>
+        <td>$450,000</td>
+        <td>$96,000</td>
+        <td>1,240 t</td>
+        <td>4.7 yrs</td>
+        <td><span class="badge badge-blue">91%</span></td>
+        <td><span class="badge badge-orange">Medium</span></td>
+      </tr>
+      <tr>
+        <td>Legacy HVAC Fans</td>
+        <td style="color:var(--brand);font-weight:700">HVLS Smart Fans</td>
+        <td>$85,000</td>
+        <td>$22,000</td>
+        <td>280 t</td>
+        <td>3.9 yrs</td>
+        <td><span class="badge badge-blue">87%</span></td>
+        <td><span class="badge badge-green">Low</span></td>
+      </tr>
+      <tr>
+        <td>Diesel Fleet Mix</td>
+        <td style="color:var(--brand);font-weight:700">Biofuel / EV Transition</td>
+        <td>$210,000</td>
+        <td>$31,000</td>
+        <td>620 t</td>
+        <td>6.2 yrs</td>
+        <td><span class="badge badge-blue">82%</span></td>
+        <td><span class="badge badge-orange">Medium</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="comparison-table">
+              <div class="ct-header">
+                <h3>↕ Detailed Scenarios Comparison</h3>
+              </div>
+              <table class="data-table">
+                <thead><tr><th>METRIC CATEGORY</th><th>BASELINE (AS-IS)</th><th>OPTIMIZATION SCENARIO B</th></tr></thead>
+                <tbody>
+                  <tr><td style="font-weight:600">Primary Equipment</td><td>Standard Gas Boiler (2012)<br><span style="font-size:10px;color:var(--text-3)">12% Efficiency | Maintenance High</span></td><td style="color:var(--brand);font-weight:600">High-Efficiency Heat Pump<br><span style="font-size:10px;color:var(--text-2)">98% Efficiency | Smart Controls</span></td></tr>
+                  <tr><td style="font-weight:600">Upfront Capex</td><td>$0<br><span style="font-size:10px;color:var(--text-3)">Maintenance only</span></td><td style="color:var(--brand);font-weight:600">$450,000<br><span style="font-size:10px;color:var(--text-2)">Includes utility rebate of $50k</span></td></tr>
+                  <tr><td style="font-weight:600">Energy Consumption</td><td>12,500 MWh/yr</td><td style="color:var(--brand);font-weight:600">4,200 MWh/yr<br><span style="font-size:10px;color:var(--text-2)">100% Electrified (Net Zero)</span></td></tr>
+                  <tr><td style="font-weight:600">Scope 1 Emissions</td><td>2,400 tCO2e</td><td style="color:var(--brand);font-weight:600">120 tCO2e<br><span style="font-size:10px;color:var(--text-2)">95% direct reduction</span></td></tr>
+                  <tr><td style="font-weight:600">Maintenance Reserve</td><td>$45,000/yr</td><td style="color:var(--brand);font-weight:600">$12,000/yr<br><span style="font-size:10px;color:var(--text-2)">5-year full service warranty</span></td></tr>
+                </tbody>
+              </table>
+              <div style="padding:10px 16px;font-size:11px;color:var(--text-2);display:flex;justify-content:space-between">
+                <span>* Scenario B assumes 5% year-on-year electricity price increase.</span>
+                <a style="color:var(--brand);cursor:pointer;font-weight:600">View Full Methodology</a>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="sim-params">
+              <h3>Simulation Parameters</h3>
+              <p>Adjust variables to see ROI sensitivity</p>
+              <div class="param-row">
+                <label>PROJECT HORIZON <span>10 Years</span></label>
+                <input type="range" min="1" max="20" value="10">
+              </div>
+              <div class="param-row">
+                <label>CARBON TAX ($/TCO2E) <span style="color:var(--brand)">$50</span></label>
+                <input type="range" min="0" max="200" value="50">
+                <div style="font-size:10px;color:var(--text-3);margin-top:3px">Adjusting for potential EPA 2026 regulations</div>
+              </div>
+              <div class="param-row">
+                <label>GRID DECARBONIZATION RATE <span>3.2% / yr</span></label>
+                <div class="rate-toggle">
+                  <button class="rate-btn">Conservative</button>
+                  <button class="rate-btn active">Standard</button>
+                  <button class="rate-btn">Aggressive</button>
+                </div>
+              </div>
+              <button class="add-param-btn">+ Add Custom Parameter</button>
+            </div>
+            <div class="ai-strategy-panel">
+              <div class="ai-strategy-label">✦ AI Strategy Engine</div>
+              <div class="ai-strat-card">
+                <div class="ai-strat-card-header">
+                  <h5>Phased Implementation</h5>
+                  <span class="badge badge-blue">AI Recommended</span>
+                </div>
+                <p>AI suggests splitting heat pump deployment into two phases. Install first 3 units in Q4 to capitalize on 2024 Federal Tax Credit 'Section 45X' before it sunsets.</p>
+                <div class="ai-strat-impact">✦ Est. Impact: +$12k NPV boost</div>
+              </div>
+              <div class="ai-strat-card">
+                <div class="ai-strat-card-header">
+                  <h5>Load Balancing Opportunity</h5>
+                  <span class="badge badge-blue">AI Recommended</span>
+                </div>
+                <p>Based on your facility B's peak energy data, pairing this replacement with 250kWh Battery Storage would reduce peak demand charges by 22%.</p>
+                <div class="ai-strat-impact">✦ Est. Impact: 1.8yr Payback reduction</div>
+              </div>
+              <div class="ai-strat-card">
+                <div class="ai-strat-card-header">
+                  <h5>Vendor Conflict Warning</h5>
+                  <span class="badge badge-orange">AI Recommended</span>
+                </div>
+                <p>Rule-based check: Standard Heat Pump Model X may require additional structural reinforcement for Roof Section 4. Verify weight loads before procurement.</p>
+                <div class="ai-strat-impact" style="color:var(--accent2)">✦ Est. Impact: Avoids $15k rework</div>
+              </div>
+              <a style="font-size:12px;color:var(--brand);cursor:pointer;font-weight:600;display:flex;align-items:center;gap:4px;padding:8px 0">💡 Generate New Scenarios</a>
+            </div>
+            <div class="scenario-set">
+              <h4>ACTIVE SCENARIO SET</h4>
+              <div class="scenario-item">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div class="scenario-item-dot" style="background:#374151"></div>
+                  <span style="font-weight:600">Baseline (Current Ops)</span>
+                </div>
+                <span class="badge badge-green">ACTIVE</span>
+              </div>
+              <div class="scenario-item">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div class="scenario-item-dot" style="background:var(--brand)"></div>
+                  <span style="font-weight:600">Scenario B (High Efficiency)</span>
+                </div>
+                <span style="font-size:10px;color:var(--text-3);font-weight:600">COMPARING</span>
+              </div>
+              <div class="scenario-item">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div class="scenario-item-dot" style="background:var(--danger)"></div>
+                  <span style="font-weight:600">Scenario C (Net Zero Max)</span>
+                </div>
+                <span style="font-size:10px;color:var(--text-3);font-weight:600">DRAFT</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── REPORTS ── -->
+      <div class="page" id="page-reports">
+        <div class="page-header">
+          <div class="page-title">
+            <h1>Report Builder</h1>
+            <p>Configure your environmental disclosure documents.</p>
+          </div>
+        </div>
+        <div class="reports-grid">
+          <div>
+            <div class="report-steps">
+              <h3>Build Steps</h3>
+              <div class="report-step-item">
+                <div class="step-num done">1</div>
+                <div><div style="font-size:13px;font-weight:700">Scope & Configuration</div></div>
+              </div>
+              <div class="report-step-item">
+                <div class="step-num pending">2</div>
+                <div style="color:var(--text-2)"><div style="font-size:13px;font-weight:600">Content Selection</div></div>
+              </div>
+              <div class="report-step-item">
+                <div class="step-num pending">3</div>
+                <div style="color:var(--text-2)"><div style="font-size:13px;font-weight:600">Delivery & Export</div></div>
+              </div>
+              <div style="border-top:1px solid var(--border);margin:20px 0 16px"></div>
+              <div style="margin-bottom:14px">
+                <div style="font-size:12px;font-weight:700;margin-bottom:8px">Report Scope</div>
+                <div style="display:flex;gap:6px">
+                  <button class="btn btn-primary btn-sm">🌐 Global Aggregate</button>
+                  <button class="btn btn-outline btn-sm">🏢 Single Facility</button>
+                </div>
+              </div>
+              <div style="margin-bottom:14px">
+                <div style="font-size:12px;font-weight:700;margin-bottom:8px">Reporting Period</div>
+                <div style="display:flex;gap:4px">
+                  <button class="btn btn-outline btn-sm">YTD</button>
+                  <button class="btn btn-primary btn-sm">Q3 2024</button>
+                  <button class="btn btn-outline btn-sm">Custom</button>
+                </div>
+              </div>
+              <div style="margin-bottom:20px">
+                <div style="font-size:12px;font-weight:700;margin-bottom:8px">Report Title</div>
+                <input style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;outline:none" placeholder="e.g., Annual Sustainability Review 2024">
+              </div>
+              <button class="btn btn-primary" style="width:100%;justify-content:center">Next Step ›</button>
+            </div>
+          </div>
+          <div class="report-preview">
+            <div class="report-preview-header">
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700">
+                <span class="live-dot"></span> LIVE REPORT PREVIEW
+              </div>
+              <div style="display:flex;gap:10px">
+                <button class="btn btn-outline btn-sm">🖨 Print</button>
+                <button class="btn btn-outline btn-sm">⤢ Fullscreen</button>
+              </div>
+            </div>
+            <div class="report-doc">
+              <div class="report-doc-header">
+                <div>
+                  <div class="land-logo" style="font-size:14px"><div class="land-logo-icon" style="width:22px;height:22px"><svg viewBox="0 0 16 16"><path d="M8 2L14 5v6L8 14 2 11V5z"/></svg></div>TerraTrace</div>
+                  <h1 class="report-doc-title">Environmental Impact &<br>Emissions Disclosure</h1>
+                  <div class="report-doc-meta">
+                    <div class="report-doc-meta-item"><label>SCOPE</label><p>Global Operations (12 Facilities)</p></div>
+                    <div class="report-doc-meta-item"><label>STATUS</label><p><span class="badge badge-green">Verified Data</span></p></div>
+                  </div>
+                </div>
+                <div style="text-align:right;font-size:11px;color:var(--text-2)"><div style="font-weight:700;color:var(--text-3);font-size:9px;letter-spacing:.06em;text-transform:uppercase">REPORT GENERATED</div>October 24, 2024</div>
+              </div>
+              <div class="exec-summary">
+                <h3>≋ Executive Summary</h3>
+                <div class="exec-stats">
+                  <div class="exec-stat"><label>TOTAL EMISSIONS</label><div class="v">14,290.4</div><div style="font-size:10px;color:var(--text-2)">Metric Tons CO2e</div></div>
+                  <div class="exec-stat"><label>YOY CHANGE</label><div class="v" style="color:var(--accent)">-4.2%</div><div style="font-size:10px;color:var(--text-2)">Improvement vs 2023</div></div>
+                  <div class="exec-stat"><label>INTENSITY</label><div class="v">0.82</div><div style="font-size:10px;color:var(--text-2)">tCO2e / Product Unit</div></div>
+                </div>
+              </div>
+              <div class="card" style="margin-bottom:16px">
+                <h4 style="font-size:13px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px">✦ AI Strategic Recommendations <span class="badge badge-blue">AI Insight</span></h4>
+                <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+                  <div style="font-size:12px;font-weight:700;color:var(--brand);margin-bottom:3px">HVAC Efficiency Protocol</div>
+                  <p style="font-size:11px;color:var(--text-2);line-height:1.5">AI Engine identifies high thermodynamic inefficiency in Facilities A3 and B12. Implementing variable frequency drives could reduce annual Scope 2 emissions by <strong>240 tons</strong> with an ROI of 14 months.</p>
+                </div>
+                <div style="padding:10px 0">
+                  <div style="font-size:12px;font-weight:700;color:var(--brand);margin-bottom:3px">Renewable Energy Mix Optimization</div>
+                  <p style="font-size:11px;color:var(--text-2);line-height:1.5">Current solar adoption is lagging in Southeast regional hubs. Predictive modeling suggests a <strong>12.5% reduction</strong> in baseline footprint if PPA agreements are signed by Q1 2025.</p>
+                </div>
+              </div>
+              <div class="card">
+                <h4 style="font-size:13px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px">⏱ Audit & Verification Log</h4>
+                <p style="font-size:11px;color:var(--text-2);margin-bottom:10px">This report data is verified using TerraTrace's blockchain-backed ledger. Each data point is linked to its primary source for government audit readiness.</p>
+                <table class="audit-table">
+                  <thead><tr><th>SOURCE ID</th><th>VERIFICATION METHOD</th><th>TIMESTAMP</th></tr></thead>
+                  <tbody>
+                    <tr><td>IOT-SM-902</td><td><span class="verified-dot"></span>Direct API</td><td>2024-10-23 04:12</td></tr>
+                    <tr><td>CSV-LOG-X2</td><td><span class="verified-dot"></span>Manual Upload (Verified)</td><td>2024-10-22 18:55</td></tr>
+                    <tr><td>UTL-BILL-44</td><td><span class="verified-dot"></span>OCR Document Scan</td><td>2024-10-21 11:30</td></tr>
+                    <tr><td>GAS-MTR-12</td><td><span class="verified-dot"></span>Smart Meter Sync</td><td>2024-10-20 09:00</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+// ── Navigation ──
+function showLanding(){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-landing').classList.add('active');
+}
+function showSignin(){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-signin').classList.add('active');
+}
+function doLogin(){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-app').classList.add('active');
+  showPage('dashboard');
+  setTimeout(initCharts,100);
+}
+function showPage(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  const nav=document.getElementById('nav-'+page);
+  if(nav)nav.classList.add('active');
+  setTimeout(()=>{
+    if(page==='dashboard')initDashCharts();
+    if(page==='calculators')initCalcChart();
+    if(page==='closure')initClosureChart();
+    if(page==='scenarios')initScenariosChart();
+  },50);
+}
+// ── Accounting method toggle ──
+document.querySelectorAll('.acct-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    b.parentElement.querySelectorAll('.acct-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+  });
+});
+document.querySelectorAll('.chart-toggle button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    b.parentElement.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+  });
+});
+document.querySelectorAll('.rate-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    b.parentElement.querySelectorAll('.rate-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+  });
+});
+
+// ── Charts ──
+let charts={};
+function destroyChart(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
+
+function initDashCharts(){
+  destroyChart('emissionsChart');destroyChart('scopeDonut');
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const curr=[4200,4100,3900,3800,3600,3500,3400,3300,3200,3100,3050,3000];
+  const prev=[4400,4350,4300,4200,4150,4100,4050,4000,3950,3900,3850,3800];
+  const ctx1=document.getElementById('emissionsChart').getContext('2d');
+  const grad=ctx1.createLinearGradient(0,0,0,200);
+  grad.addColorStop(0,'rgba(91,91,214,.25)');grad.addColorStop(1,'rgba(91,91,214,0)');
+  charts['emissionsChart']=new Chart(ctx1,{type:'line',data:{labels:months,datasets:[
+    {label:'Current Year',data:curr,borderColor:'#5B5BD6',backgroundColor:grad,fill:true,tension:.4,pointRadius:0,borderWidth:2},
+    {label:'Previous Year',data:prev,borderColor:'rgba(91,91,214,.3)',backgroundColor:'transparent',fill:false,tension:.4,pointRadius:0,borderWidth:1.5,borderDash:[4,4]}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'#F3F4F6'},ticks:{font:{size:10},callback:v=>v===0?'0k':v/1000+'k'}}}}});
+  const ctx2=document.getElementById('scopeDonut').getContext('2d');
+  charts['scopeDonut']=new Chart(ctx2,{type:'doughnut',data:{labels:['Scope 1','Scope 2','Scope 3'],datasets:[{data:[25,35,40],backgroundColor:['#5B5BD6','#EF4444','#10B981'],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'70%',plugins:{legend:{display:false}}}});
+}
+function initCalcChart(){
+  destroyChart('calcDonut');
+  const ctx=document.getElementById('calcDonut').getContext('2d');
+  charts['calcDonut']=new Chart(ctx,{type:'doughnut',data:{labels:['Scope 1','Scope 2','Scope 3'],datasets:[{data:[15,78,7],backgroundColor:['#5B5BD6','#EF4444','#10B981'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false}}}});
+}
+function initClosureChart(){
+  destroyChart('closureChart');
+  const ctx=document.getElementById('closureChart').getContext('2d');
+  charts['closureChart']=new Chart(ctx,{type:'bar',data:{labels:['2023','2024','2025 (Closure)','2026','2027','2028'],datasets:[
+    {label:'Post-Closure State',data:[4400,4450,null,800,750,720],backgroundColor:'#5B5BD6',borderRadius:4},
+    {label:'Decommissioning Peak',data:[null,null,6200,null,null,null],backgroundColor:'#EF4444',borderRadius:4},
+    {label:'Projected (No Closure)',type:'line',data:[4400,4450,4500,4550,4600,4650],borderColor:'rgba(91,91,214,.4)',borderDash:[6,4],fill:false,pointRadius:0,borderWidth:2,tension:0}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'#F3F4F6'},ticks:{font:{size:10}}}}}});
+}
+function initScenariosChart(){
+  destroyChart('cashflowChart');
+  const ctx=document.getElementById('cashflowChart').getContext('2d');
+  const labels=['Year 0','Year 1','Year 2','Year 3','Year 4','Year 5','Year 6','Year 7','Year 8','Year 9','Year 10'];
+  const baseline=[-450000,-420000,-390000,-360000,-330000,-300000,-270000,-240000,-210000,-180000,-150000];
+  const scenario=[-450000,-380000,-300000,-200000,-80000,50000,190000,240000,280000,310000,340000];
+  const grad=ctx.createLinearGradient(0,0,0,220);
+  grad.addColorStop(0,'rgba(91,91,214,.15)');grad.addColorStop(1,'rgba(91,91,214,0)');
+  charts['cashflowChart']=new Chart(ctx,{type:'line',data:{labels,datasets:[
+    {label:'Optimization Scenario B',data:scenario,borderColor:'#5B5BD6',backgroundColor:grad,fill:true,tension:.4,pointRadius:0,borderWidth:2},
+    {label:'Baseline (Current)',data:baseline,borderColor:'rgba(107,114,128,.5)',backgroundColor:'transparent',fill:false,tension:.1,pointRadius:0,borderWidth:1.5,borderDash:[5,5]}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{grid:{color:'#F3F4F6'},ticks:{font:{size:10},callback:v=>'$'+(v/1000).toFixed(0)+'k'}}}}});
+}
+function initCharts(){initDashCharts();}
+
+function updateCalc(){
+  const s1=parseFloat(document.querySelector('#page-calculators .scope-card:nth-child(1) input').value)||0;
+  const s2=parseFloat(document.querySelector('#page-calculators .scope-card:nth-child(2) input').value)||0;
+  const total=Math.round((s1*1.2+s2*1.0)/1000+800);
+  document.getElementById('total-co2e').textContent=total.toLocaleString();
+}
+</script>
+</body>
+</html>
